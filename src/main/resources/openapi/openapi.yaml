@@ -1,0 +1,143 @@
+openapi: 3.0.0
+info:
+  title: API de gestion des équipes de football
+  description: API permettant de gérer les équipes, leurs joueurs, et le budget associé.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+
+paths:
+  /equipes-nice/getAll:
+    get:
+      summary: Récupérer la liste des équipes
+      description: Retourne une liste paginée d'équipes avec les joueurs associés.
+      operationId: getEquipes
+      parameters:
+        - name: page
+          in: query
+          description: Page de résultats à retourner
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Nombre d'éléments par page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: sortBy
+          in: query
+          description: Champ de tri (name, acronym, budget uniquement)
+          required: false
+          schema:
+            type: string
+            enum: [name, acronym, budget]
+            default: name
+        - name: sortDir
+          in: query
+          description: Direction du tri (asc ou desc)
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+      responses:
+        '200':
+          description: "Détails de l'équipe"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EquipeResponse'
+        '400':
+          description: Paramètres de la requête invalides
+
+  /equipe-nice/add:
+    post:
+      summary: Ajouter une nouvelle équipe
+      description: Crée une équipe avec ou sans joueurs associés.
+      operationId: addEquipe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EquipeRequest'
+      responses:
+        '201':
+          description: Équipe créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EquipeDTO'
+        '400':
+          description: Requête invalide (manque des champs obligatoires)
+
+components:
+  schemas:
+    EquipeDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        acronym:
+          type: string
+        budget:
+          type: number
+          format: float
+        joueurs:
+          type: array
+          items:
+            $ref: '#/components/schemas/JoueurDTO'
+
+    EquipeRequest:
+      type: object
+      required:
+        - name
+        - acronym
+        - budget
+      properties:
+        name:
+          type: string
+        acronym:
+          type: string
+        budget:
+          type: number
+          format: float
+        joueurs:
+          type: array
+          items:
+            $ref: '#/components/schemas/JoueurRequest'
+
+    JoueurDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        position:
+          type: string
+
+    JoueurRequest:
+      type: object
+      required:
+        - name
+        - position
+      properties:
+        name:
+          type: string
+        position:
+          type: string
+
+    EquipeResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquipeDTO'
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
