@@ -8,6 +8,4 @@ import java.util.Optional;
 
 @Repository
 public interface EquipeRepository extends JpaRepository<Equipe, Long> {
-    // Recherche d'une équipe par son acronyme
-    Optional<Equipe> findByAcronym(String acronym);
 }
